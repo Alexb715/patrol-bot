@@ -46,13 +46,13 @@ time_slots = [
 ]
 
 mapLS = [
-    "City of Orillia",
-    "City Of Barrie",
-    "Simcoe County Central",
-    "Kawartha Lakes",
-    "Peterborough",
-    "Northumberland",
-    "Prince Edward County",
+    "Region Of Waterloo",
+    "City Of Guelph",
+    "Wellington County",
+    "Brant County",
+    "Oxford County",
+    "Middlesex County",
+    "City Of London",
 ]
 
 mapLC = [
