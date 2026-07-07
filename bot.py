@@ -13,6 +13,7 @@ COGS = [
     "cogs.stats",
     "cogs.testing",
     "cogs.welcome",
+    "cogs.questionnaire",
 ]
 
 

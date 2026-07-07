@@ -60,6 +60,19 @@ A Discord bot for managing daily patrol scheduling, AOP (Area of Patrol) voting,
 
 All stats commands support an optional `period` parameter: **All Time** (default) or **Last 2 Weeks**.
 
+### Questionnaires
+
+Post an **anonymous** questionnaire into a public channel, collect answers for a set window, then release the results — an aggregated digest plus each person's answers, attributed — into a separate **private** channel for leadership. Nothing about who answered is ever shown publicly. Members answer through an ephemeral form (dropdowns + a text box); one response each, editable until close. Edit the questions in `questions.py`.
+
+| Command | Description |
+|---|---|
+| `/questionnaire start [channel] [results_channel] [duration] [title]` | Post a questionnaire. Unset options fall back to the configured defaults. `duration` accepts `48h`, `30m`, `2d`, `1w`, `1d12h`, … |
+| `/questionnaire close [id]` | Close now and release results (`id` optional when exactly one is open). |
+| `/questionnaire status` | List open questionnaires with response counts. |
+| `/questionnaire purge <id>` | Delete a questionnaire's stored responses. |
+
+A questionnaire also auto-closes when its duration elapses (a restart-safe background check). Responses live in the same SQLite database as the patrol stats.
+
 All commands require the admin role and must be used in the admin command channel.
 
 ## How It Works
@@ -101,6 +114,12 @@ City of Orillia, City Of Barrie, Simcoe County Central, Kawartha Lakes, Peterbor
 | `PING_ROLE_ID` | Role to ping for voting and briefing reminders |
 | `ADMIN_ROLE_ID` | Role required to use admin commands |
 | `DATABASE_PATH` | Path to SQLite database (default: `patrol_stats.db`) |
+| `QUESTIONNAIRE_SURVEY_CHANNEL_ID` | Default public channel for `/questionnaire start` (optional) |
+| `QUESTIONNAIRE_RESULTS_CHANNEL_ID` | Default **private** channel where attributed results are released (optional) |
+| `QUESTIONNAIRE_DEFAULT_DURATION` | Default open duration, e.g. `48h` (optional) |
+| `QUESTIONNAIRE_SHOW_LIVE_COUNT` | Show a live "Responses: N" count (people who fully answered) on the public embed — `true`/`false` (default `true`) |
+| `QUESTIONNAIRE_RESULTS_AS_FILE` | Also attach a CSV of attributed answers on release — `true`/`false` (default `false`) |
+| `QUESTIONNAIRE_PURGE_ON_RELEASE` | Delete stored responses right after releasing — `true`/`false` (default `false`) |
 
 ## Docker
 

@@ -25,6 +25,21 @@ SUPPORT_CHANNEL_ID = int(os.getenv("SUPPORT_CHANNEL_ID", 0))
 PING_ROLE_ID = int(os.getenv("PING_ROLE_ID", 0))
 ADMIN_ROLE_ID = int(os.getenv("ADMIN_ROLE_ID", 0))
 
+# --- Questionnaire feature ---
+# Public channel the /questionnaire is posted in (default when the command omits
+# `channel:`), and the PRIVATE channel attributed results are released to
+# (restrict it to leadership — it's the only place responders' names appear).
+QUESTIONNAIRE_SURVEY_CHANNEL_ID = int(os.getenv("QUESTIONNAIRE_SURVEY_CHANNEL_ID", 0))
+QUESTIONNAIRE_RESULTS_CHANNEL_ID = int(os.getenv("QUESTIONNAIRE_RESULTS_CHANNEL_ID", 0))
+QUESTIONNAIRE_DEFAULT_DURATION = os.getenv("QUESTIONNAIRE_DEFAULT_DURATION", "48h")
+
+_TRUE = {"1", "true", "yes", "on", "y"}
+# On by default: the public survey embed shows a live "Responses: N" count of
+# people who fully answered. Set QUESTIONNAIRE_SHOW_LIVE_COUNT=false to hide it.
+QUESTIONNAIRE_SHOW_LIVE_COUNT = os.getenv("QUESTIONNAIRE_SHOW_LIVE_COUNT", "true").strip().lower() in _TRUE
+QUESTIONNAIRE_RESULTS_AS_FILE = os.getenv("QUESTIONNAIRE_RESULTS_AS_FILE", "false").strip().lower() in _TRUE
+QUESTIONNAIRE_PURGE_ON_RELEASE = os.getenv("QUESTIONNAIRE_PURGE_ON_RELEASE", "false").strip().lower() in _TRUE
+
 MINIMUM_PATROL = 4
 
 TIMEZONE = pytz.timezone("US/Eastern")
