@@ -110,6 +110,13 @@ QUESTIONS: tuple[Question, ...] = (
         max_select=8,
     ),
     Question(
+        key="vmenu_preference",
+        label="Server style vs Vmenu",
+        prompt="Do you prefer the current server style or would you like to switch back to Vmenu?",
+        kind="single_choice",
+        choices=("Yes", "No", "Indifferent"),
+    ),
+    Question(
         key="suggestions",
         label="Suggestions",
         prompt=(

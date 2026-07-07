@@ -172,7 +172,7 @@ class _QuestionSelect(discord.ui.Select):
 
 class _SubmitButton(discord.ui.Button):
     def __init__(self):
-        super().__init__(label="Submit", style=discord.ButtonStyle.primary)
+        super().__init__(label="Submit", style=discord.ButtonStyle.success)
 
     async def callback(self, interaction):
         view = self.view
@@ -180,6 +180,21 @@ class _SubmitButton(discord.ui.Button):
             await interaction.response.send_modal(ResponseModal(view))
         else:
             await view.cog.finalize_response(interaction, view, {})
+
+
+class _NavButton(discord.ui.Button):
+    """Move between pages of choice questions. Every dropdown saves its value to
+    the view as it changes, so navigating between pages never loses answers."""
+
+    def __init__(self, label, delta, style):
+        super().__init__(label=label, style=style)
+        self.delta = delta
+
+    async def callback(self, interaction):
+        view = self.view
+        view.page += self.delta
+        view.render_page()
+        await interaction.response.edit_message(view=view)
 
 
 class ResponseView(discord.ui.View):
@@ -196,21 +211,29 @@ class ResponseView(discord.ui.View):
         self.answers = {
             q.key: existing[q.key] for q in self.choice_questions if q.key in existing
         }
+        # Discord views allow 5 action rows; each dropdown takes one and we
+        # reserve a row for the nav/submit buttons. So choice questions are split
+        # into pages of MAX_CHOICE_SELECTS dropdowns, with Back/Next to move
+        # between pages and Submit on the final page. Text questions go into the
+        # modal opened by Submit.
+        self.pages = [
+            self.choice_questions[i : i + MAX_CHOICE_SELECTS]
+            for i in range(0, len(self.choice_questions), MAX_CHOICE_SELECTS)
+        ] or [[]]
+        self.page = 0
+        self.render_page()
 
-        rendered = self.choice_questions[:MAX_CHOICE_SELECTS]
-        if len(self.choice_questions) > MAX_CHOICE_SELECTS:
-            # Extension point: paginate the form across multiple ephemeral
-            # messages if a round ever needs more than 4 choice questions.
-            logger.warning(
-                "Questionnaire %s has %d choice questions; only the first %d fit "
-                "the form.",
-                questionnaire_id,
-                len(self.choice_questions),
-                MAX_CHOICE_SELECTS,
-            )
-        for question in rendered:
-            self.add_item(_QuestionSelect(question, existing.get(question.key)))
-        self.add_item(_SubmitButton())
+    def render_page(self):
+        self.clear_items()
+        for question in self.pages[self.page]:
+            current = self.answers.get(question.key, self.existing.get(question.key))
+            self.add_item(_QuestionSelect(question, current))
+        if self.page > 0:
+            self.add_item(_NavButton("Back", -1, discord.ButtonStyle.secondary))
+        if self.page < len(self.pages) - 1:
+            self.add_item(_NavButton("Next", 1, discord.ButtonStyle.primary))
+        else:
+            self.add_item(_SubmitButton())
 
 
 class ResponseModal(discord.ui.Modal):
